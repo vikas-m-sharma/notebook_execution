@@ -10,14 +10,14 @@ from app.schemas.notebook_metadata import NotebookMetadataResponse
 
 class NotebookCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, json_schema_extra={"example": "Fraud Analysis"})
-    description: Optional[str] = Field(None, json_schema_extra={"example": "Fraud detection analysis notebook"})
-    language: str = Field("python", json_schema_extra={"example": "python"})
+    description: Optional[str] = Field(None, max_length=2048, json_schema_extra={"example": "Fraud detection analysis notebook"})
+    language: str = Field("python", max_length=50, json_schema_extra={"example": "python"})
 
 
 class NotebookUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    language: Optional[str] = None
+    description: Optional[str] = Field(None, max_length=2048)
+    language: Optional[str] = Field(None, max_length=50)
 
 
 class NotebookResponse(BaseModel):

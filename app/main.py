@@ -77,10 +77,11 @@ app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# SEC-020: Register health probe router at root (no auth, safe for liveness probes)
+# SEC-020: Register health probe router at root and /api/v1 (no auth, safe for liveness probes)
 app.include_router(health_probe_router, prefix="", tags=["health"])
+app.include_router(health_probe_router, prefix="/api/v1", tags=["health"])
 
-# Register protected API router ONLY at /api/v1 (not duplicated at root)
+# Register protected API router at /api/v1
 app.include_router(v1_router, prefix="/api/v1", tags=["v1"])
 
 

@@ -8,9 +8,9 @@ from pydantic import BaseModel, ConfigDict, Field
 class CreateConnectorRequest(BaseModel):
     """Schema for creating a platform data connector definition."""
 
-    name: str = Field(..., description="Unique connector identifier name (e.g. 'sales-db').")
-    connector_type: str = Field(..., description="Connector type (e.g. postgresql, mysql, mssql, mongodb, s3).")
-    category: str = Field(..., description="Connector category (e.g. RELATIONAL_DATABASE, NOSQL_DATABASE, OBJECT_STORAGE).")
+    name: str = Field(..., min_length=1, max_length=255, description="Unique connector identifier name (e.g. 'sales-db').")
+    connector_type: str = Field(..., max_length=50, description="Connector type (e.g. postgresql, mysql, mssql, mongodb, s3).")
+    category: str = Field(..., max_length=50, description="Connector category (e.g. RELATIONAL_DATABASE, NOSQL_DATABASE, OBJECT_STORAGE).")
     configuration: dict[str, Any] = Field(..., description="Structured connection configuration (host, port, database, bucket, etc.).")
     secret_payload: Optional[dict[str, Any]] = Field(None, description="Optional secret credentials (username, password, access_key, etc.). Never returned in responses.")
 
@@ -18,7 +18,7 @@ class CreateConnectorRequest(BaseModel):
 class UpdateConnectorRequest(BaseModel):
     """Schema for updating connector configuration or secret payload."""
 
-    name: Optional[str] = Field(None, description="Updated connector name.")
+    name: Optional[str] = Field(None, min_length=1, max_length=255, description="Updated connector name.")
     configuration: Optional[dict[str, Any]] = Field(None, description="Updated configuration parameters.")
     secret_payload: Optional[dict[str, Any]] = Field(None, description="Updated secret payload. Never returned in responses.")
 

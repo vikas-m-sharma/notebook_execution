@@ -1,10 +1,35 @@
 import importlib.metadata
 import io
+import os
 import subprocess
 import sys
 import time
 import traceback
 from typing import Any
+
+# Allowed environment variables for worker execution process
+_ALLOWED_ENV_VARS = {
+    "PATH",
+    "SYSTEMROOT",
+    "TEMP",
+    "TMP",
+    "PYTHONPATH",
+    "LANG",
+    "LC_ALL",
+    "HOMEPATH",
+    "USERPROFILE",
+    "USERNAME",
+    "OS",
+    "COMSPEC",
+    "PATHEXT",
+}
+
+
+def _sanitize_worker_environment() -> None:
+    """SEC-003: Strip all host secrets and database credentials from worker process environment."""
+    for key in list(os.environ.keys()):
+        if key.upper() not in _ALLOWED_ENV_VARS:
+            os.environ.pop(key, None)
 
 
 def _get_installed_package_version(package_name: str) -> str | None:
@@ -22,6 +47,9 @@ def _get_installed_package_version(package_name: str) -> str | None:
 
 def run_python_worker(conn) -> None:
     """Worker process main loop executing code and dependency requests received via IPC pipe."""
+    # SEC-003: Immediately purge host environment variables (e.g. DATABASE_URL)
+    _sanitize_worker_environment()
+
     # Isolated execution globals namespace for state persistence within child worker process
     globals_dict: dict[str, Any] = {
         "__name__": "__main__",

@@ -8,13 +8,13 @@ from pydantic import BaseModel, ConfigDict, Field
 class NotebookCellCreate(BaseModel):
     position: int = Field(..., ge=0, json_schema_extra={"example": 0})
     cell_type: str = Field("code", json_schema_extra={"example": "code"})
-    source: str = Field("", json_schema_extra={"example": "import pandas as pd"})
+    source: str = Field("", max_length=1_000_000, json_schema_extra={"example": "import pandas as pd"})
 
 
 class NotebookCellUpdate(BaseModel):
     position: Optional[int] = Field(None, ge=0)
     cell_type: Optional[str] = None
-    source: Optional[str] = None
+    source: Optional[str] = Field(None, max_length=1_000_000)
 
 
 class NotebookCellResponse(BaseModel):

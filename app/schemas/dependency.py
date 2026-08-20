@@ -8,14 +8,14 @@ from pydantic import BaseModel, ConfigDict, Field
 class DependencyCreate(BaseModel):
     """Schema for declaring a notebook package dependency."""
 
-    package_name: str = Field(..., description="PyPI package name (e.g. pandas, numpy).")
-    version_specifier: Optional[str] = Field(None, description="Optional version specifier (e.g. ==2.2.3, >=2.0).")
+    package_name: str = Field(..., max_length=255, description="PyPI package name (e.g. pandas, numpy).")
+    version_specifier: Optional[str] = Field(None, max_length=255, description="Optional version specifier (e.g. ==2.2.3, >=2.0).")
 
 
 class DependencyUpdate(BaseModel):
     """Schema for updating a notebook package dependency version specifier."""
 
-    version_specifier: Optional[str] = Field(None, description="Updated version specifier (e.g. ==2.2.3).")
+    version_specifier: Optional[str] = Field(None, max_length=255, description="Updated version specifier (e.g. ==2.2.3).")
 
 
 class DependencyResponse(BaseModel):
@@ -41,7 +41,9 @@ class DependencyListResponse(BaseModel):
 class DependencyInstallRequest(BaseModel):
     """Schema for requesting dependency installation for a notebook."""
 
-    timeout_seconds: Optional[float] = Field(120.0, description="Optional installation timeout in seconds.")
+    timeout_seconds: Optional[float] = Field(
+        120.0, ge=1.0, le=600.0, description="Optional installation timeout in seconds (1.0 to 600.0s)."
+    )
 
 
 class DependencyOperationResponse(BaseModel):

@@ -1,6 +1,7 @@
 import uuid
 from typing import Any, Optional
 
+from app.core.encryption import decrypt_payload
 from app.models.connector import Credential
 from app.repositories.connector import CredentialRepository
 
@@ -30,7 +31,7 @@ class CredentialManager:
         cred = await self.repo.get_by_credential_id(credential_id)
         if not cred:
             return None
-        return cred.encrypted_payload
+        return decrypt_payload(cred.encrypted_payload)
 
     @classmethod
     def sanitize_credential_payload(cls, payload: Optional[dict[str, Any]]) -> dict[str, Any]:

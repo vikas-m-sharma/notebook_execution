@@ -7,12 +7,12 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class WorkspaceCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255, json_schema_extra={"example": "Data Engineering"})
-    description: Optional[str] = Field(None, json_schema_extra={"example": "Data engineering workspace"})
+    description: Optional[str] = Field(None, max_length=2048, json_schema_extra={"example": "Data engineering workspace"})
 
 
 class WorkspaceUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
+    description: Optional[str] = Field(None, max_length=2048)
 
 
 class WorkspaceResponse(BaseModel):

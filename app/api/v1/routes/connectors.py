@@ -170,9 +170,10 @@ async def test_connector(
         ) from err
     except ConnectorConnectionError as err:
         await db.commit()  # status updated to ERROR
+        conn_rec = await manager.conn_repo.get_by_id(connector_id)
         return ConnectorTestResponse(
             connector_id=str(connector_id),
-            name="Unknown",
+            name=conn_rec.name if conn_rec else "Unknown",
             status="ERROR",
             capabilities={},
         )

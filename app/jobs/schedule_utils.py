@@ -55,21 +55,24 @@ def calculate_next_run(
     if now_in_tz.tzinfo is None:
         now_in_tz = now_in_tz.replace(tzinfo=tz)
 
-    parts = cron_str.strip().split()
-    minute_spec, hour_spec, dom_spec, month_spec, dow_spec = parts
+    try:
+        from croniter import croniter
 
-    # Minute step calculation fallback
-    step_minutes = 1
-    if "/" in minute_spec:
-        try:
-            step_minutes = int(minute_spec.split("/")[1])
-        except (ValueError, IndexError):
-            step_minutes = 1
-    elif minute_spec != "*":
-        try:
-            step_minutes = max(1, int(minute_spec.split(",")[0]))
-        except ValueError:
-            step_minutes = 1
-
-    next_time = now_in_tz + timedelta(minutes=step_minutes)
-    return next_time
+        itr = croniter(cron_str, now_in_tz)
+        return itr.get_next(datetime)
+    except Exception:
+        # Fallback if croniter unavailable or parsing error
+        parts = cron_str.strip().split()
+        minute_spec = parts[0]
+        step_minutes = 1
+        if "/" in minute_spec:
+            try:
+                step_minutes = int(minute_spec.split("/")[1])
+            except (ValueError, IndexError):
+                step_minutes = 1
+        elif minute_spec != "*":
+            try:
+                step_minutes = max(1, int(minute_spec.split(",")[0]))
+            except ValueError:
+                step_minutes = 1
+        return now_in_tz + timedelta(minutes=step_minutes)
