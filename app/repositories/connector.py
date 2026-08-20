@@ -4,6 +4,7 @@ from typing import Any, Optional, Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.encryption import decrypt_payload, encrypt_payload
 from app.models.connector import Connector, Credential
 
 
@@ -108,7 +109,8 @@ class CredentialRepository:
         cred = Credential(
             credential_id=credential_id,
             credential_type=credential_type,
-            encrypted_payload=payload,
+            # SEC-002: encrypt payload before persistence; returns plaintext envelope if no key set
+            encrypted_payload=encrypt_payload(payload),
         )
         self.session.add(cred)
         await self.session.flush()

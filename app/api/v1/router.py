@@ -1,5 +1,6 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
+from app.core.security import verify_api_key
 
 from app.api.v1.routes.connectors import router as connectors_router
 from app.api.v1.routes.dependencies import router as dependencies_router
@@ -14,10 +15,12 @@ from app.api.v1.routes.workspaces import router as workspaces_router
 from app.core.database import check_database_connection
 from app.schemas.health import DatabaseHealthResponse, HealthResponse
 
-router = APIRouter()
+# SEC-020: Separate health router (probe-safe, no auth) from protected API router.
+# health_router is mounted at "/" in main.py; api_router is mounted at "/api/v1".
+health_probe_router = APIRouter()
 
 
-@router.get(
+@health_probe_router.get(
     "/health",
     response_model=HealthResponse,
     status_code=status.HTTP_200_OK,
@@ -29,7 +32,7 @@ async def health_check() -> HealthResponse:
     return HealthResponse(status="healthy")
 
 
-@router.get(
+@health_probe_router.get(
     "/health/db",
     response_model=DatabaseHealthResponse,
     status_code=status.HTTP_200_OK,
@@ -49,6 +52,10 @@ async def db_health_check() -> JSONResponse:
         content={"status": "unhealthy", "database": "disconnected"},
     )
 
+
+# Protected API router (mounted at /api/v1 in main.py)
+# SEC-001: All routes inherit API key authentication requirement.
+router = APIRouter(dependencies=[Depends(verify_api_key)])
 
 # Mount API routes
 router.include_router(workspaces_router, prefix="/workspaces", tags=["Workspaces"])

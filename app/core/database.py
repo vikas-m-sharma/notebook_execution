@@ -27,7 +27,7 @@ def get_engine() -> AsyncEngine:
             max_overflow=settings.DATABASE_MAX_OVERFLOW,
             pool_timeout=settings.DATABASE_POOL_TIMEOUT,
             pool_recycle=settings.DATABASE_POOL_RECYCLE,
-            echo=settings.DEBUG,
+            echo=False,  # CQ-006: Never echo SQL; prevents credential values from appearing in logs
         )
     return engine
 

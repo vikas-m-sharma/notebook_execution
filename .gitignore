@@ -1,5 +1,18 @@
-# Environment variables
+# Environment / secrets — NEVER commit these (SEC-012)
 .env
+.env.*
+*.env
+.env.local
+.env.production
+.env.staging
+.env.test
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
 
 # Python Virtual Environment
 .venv/
